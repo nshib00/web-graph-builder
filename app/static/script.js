@@ -16,8 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => console.error('Error while fetching graphs list:', error));
 
     function loadGraph(graphId) {
+        const graphImage = document.getElementById('graph-image');
         fetch(`/graph/${graphId}`)
             .then(response => response.json())
-            .catch(error => console.error('Error while loading graph:', error));
+            .then(data => {
+                graphImage.src = data.image;
+                graphImage.style.display = 'block';
+            }   
+        ).catch(error => console.error('Error while loading graph:', error));
     }
 });

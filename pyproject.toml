@@ -6,13 +6,16 @@ authors = [
     {name = "Nikita Shibaev",email = "nshib.54321@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.9,<4.0"
+requires-python = ">=3.11,<4.0"
 dependencies = [
     "fastapi (>=0.116.1,<0.117.0)",
     "uvicorn (>=0.35.0,<0.36.0)",
     "openpyxl (>=3.1.5,<4.0.0)",
     "python-multipart (>=0.0.20,<0.0.21)",
-    "tinydb (>=4.8.2,<5.0.0)"
+    "tinydb (>=4.8.2,<5.0.0)",
+    "networkx (>=3.5,<4.0)",
+    "matplotlib (>=3.10.6,<4.0.0)",
+    "pyvis (>=0.3.2,<0.4.0)",
 ]
 
 

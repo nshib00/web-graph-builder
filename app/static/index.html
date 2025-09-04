@@ -3,18 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Построить граф из Excel-файла</title>
-    <style>
-        .graph-container {
-            margin-top: 20px;
-        }
-        #graph-canvas {
-            width: 100%;
-            height: 400px;
-        }
-    </style>
+    <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
-    <div style="text-align: center;">
+    <div id="top-container">
         <h1>Построить граф из Excel-файла</h1>
         <form action="/upload" method="post" enctype="multipart/form-data">
             <input type="file" name="file" accept=".xlsx">
@@ -22,10 +14,16 @@
         </form>
     </div>
 
-    <div style="text-align: left;">
-        <h2>Список загрузок</h2>
-        <ul id="upload-list" class="list-group"></ul>
+    <div id="content-container">
+        <div id="uploads-container">
+            <h2>Список загрузок</h2>
+            <ul id="upload-list" class="list-group"></ul>
+        </div>
+        <div id="graph-container">
+            <img id="graph-image">
+        </div>
     </div>
+    
 
     <script src="/static/script.js"></script>
 </body>
