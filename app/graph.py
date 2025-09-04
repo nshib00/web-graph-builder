@@ -1,23 +1,24 @@
 import base64
 from io import BytesIO
 import networkx as nx
+import matplotlib
+
+matplotlib.use('Agg')  # бэкенд matplotlib без GUI, используется для ускорения отрисовки
+
 import matplotlib.pyplot as plt
 
 
 def build_graph(graph_data: dict) -> nx.Graph:
     graph = nx.Graph()
     graph.add_nodes_from(graph_data['nodes'])
-
-    edge_tuples = []
-    for edge in graph_data['edges']:
-        edge_tuples.append(edge.values())
-    graph.add_edges_from(edge_tuples)
+    edges = (tuple(edge.values()) for edge in graph_data['edges'])
+    graph.add_edges_from(edges)
     return graph
 
 
-def get_graph_image(graph: nx.Graph) -> str:
-    buf = BytesIO()
-    plt.figure(figsize=(3, 3))
+def write_graph_in_bytes(graph) -> BytesIO:
+    buffer = BytesIO()
+    plt.figure(figsize=(5, 3), dpi=60)
     pos = nx.spring_layout(graph, k=1, iterations=50)
 
     nx.draw_networkx_nodes(
@@ -34,15 +35,18 @@ def get_graph_image(graph: nx.Graph) -> str:
     )
     nx.draw_networkx_labels(
         graph, pos, 
-        font_size=10, 
-    )
-    
+        font_size=12, 
+    )  
     plt.axis('off')
-    plt.tight_layout()
-    
-    plt.savefig(buf, format='png', dpi=150, bbox_inches='tight')
+    plt.tight_layout(pad=0.1) 
+    plt.savefig(buffer, format='png', dpi=150)
     plt.close()
-    
-    buf.seek(0)
-    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    buffer.seek(0)
+    return buffer
+
+
+def get_graph_image(graph: nx.Graph) -> str:
+    buffer = write_graph_in_bytes(graph)
+    image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
     return f"data:image/png;base64,{image_base64}"
