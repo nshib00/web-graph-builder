@@ -1,7 +1,7 @@
 from pathlib import Path
 import uuid
 from fastapi import APIRouter, File, HTTPException, UploadFile
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from tinydb import Query
 
 from app.db import graphs_table
@@ -32,8 +32,9 @@ async def upload(file: UploadFile = File(...)):
             )
         graph_dict = get_graph_from_excel(file.filename)
         graphs_table.insert(graph_dict)
-        # image_data = get_graph_image(build_graph(graph_dict))
-    return RedirectResponse("/", status_code=303)
+
+        image_data = get_graph_image(build_graph(graph_dict))
+        return JSONResponse({"image": image_data})
 
 
 @app_router.get('/graphs')

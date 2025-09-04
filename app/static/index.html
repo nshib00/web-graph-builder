@@ -8,12 +8,11 @@
 <body>
     <div id="top-container">
         <h1>Построить граф из Excel-файла</h1>
-        <form action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".xlsx">
+        <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+            <input id="file-input" type="file" name="file" accept=".xlsx">
             <input type="submit" value="Загрузить файл" name="submit">
         </form>
     </div>
-
     <div id="content-container">
         <div id="uploads-container">
             <h2>Список загрузок</h2>
@@ -22,9 +21,7 @@
         <div id="graph-container">
             <img id="graph-image">
         </div>
-    </div>
-    
-
+    </div>  
     <script src="/static/script.js"></script>
 </body>
 </html>
