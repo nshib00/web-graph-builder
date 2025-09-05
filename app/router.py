@@ -1,8 +1,8 @@
 from pathlib import Path
 import uuid
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, HTTPException, UploadFile, Query
 from fastapi.responses import HTMLResponse, JSONResponse
-from tinydb import Query
+from tinydb import Query as TinyDBQuery
 
 from app.db import graphs_table
 from app.excel_parser import get_graph_from_excel
@@ -53,16 +53,20 @@ async def upload(file: UploadFile = File(...)):
 
 
 @app_router.get('/graphs')
-async def get_graphs_list(limit: int = 50, offset: int = 0):
+async def get_graphs_list(
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0)
+):
     graphs = graphs_table.all()
-    return sorted(graphs, key=lambda g: g['upload_time'], reverse=True)
+    sorted_graphs = sorted(graphs, key=lambda g: g['upload_time'], reverse=True)
+    return sorted_graphs[offset:limit + offset]
 
 
 @app_router.get('/graph/{graph_id}')
 async def get_graph_by_id(graph_id: str):
     try:
         uuid.UUID(graph_id)
-        query = Query()
+        query = TinyDBQuery()
         graph_data = graphs_table.search(query.id == graph_id)
         if not graph_data:
             raise HTTPException(status_code=404, detail='Graph not found.')
