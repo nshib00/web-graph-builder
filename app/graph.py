@@ -76,31 +76,51 @@ def get_graph_image(graph: nx.Graph) -> str:
     return f"data:image/png;base64,{image_base64}"
 
 
-def find_longest_path(graph: nx.Graph):
+def dfs_find_longest_path(
+    graph: nx.Graph,
+    start_node: int,
+    visited: set, 
+    current_path: list,
+    longest_path: list
+) -> None:
+    visited.add(start_node)
+    current_path.append(start_node)
+
+    if len(current_path) > len(longest_path):
+        longest_path.clear()
+        longest_path.extend(current_path)
+    
+    # непосещенные соседи стартовой вершины
+    neighbors = [n for n in graph.neighbors(start_node) if n not in visited]
+    
+    # отсекаем ветви, которые не могут превзойти текущий максимум
+    for neighbor in neighbors:
+        remaining_nodes = len(graph.nodes) - len(visited)
+        if len(current_path) + remaining_nodes <= len(longest_path):
+            continue  # не можем найти путь длиннее текущего максимума
+            
+        dfs_find_longest_path(graph, neighbor, visited, current_path, longest_path)
+    
+    visited.remove(start_node)
+    current_path.pop()
+
+
+def find_longest_path(graph: nx.Graph) -> list[int]:
     if not graph.nodes:
         return []
+    if len(graph.nodes) == 1:
+        return [next(iter(graph.nodes))]
     
     longest_path = []
-    
-    for start_node in graph.nodes:
+    start_nodes = list(graph.nodes())
+
+    max_start_nodes = min(10, len(start_nodes))
+    for start_node in start_nodes[:max_start_nodes]:
+        if len(longest_path) == len(graph.nodes):
+            break
+            
         visited = set()
         current_path = []
-        
-        def dfs(node):
-            nonlocal current_path, longest_path
-            visited.add(node)
-            current_path.append(node)
-            
-            if len(current_path) > len(longest_path):
-                longest_path = current_path.copy()
-            
-            for neighbor in graph.neighbors(node):
-                if neighbor not in visited:
-                    dfs(neighbor)
-            
-            visited.remove(node)
-            current_path.pop()
-        
-        dfs(start_node)
+        dfs_find_longest_path(graph, start_node, visited, current_path, longest_path)
     
     return longest_path
