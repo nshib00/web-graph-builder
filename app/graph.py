@@ -39,6 +39,7 @@ def write_graph_in_bytes(graph) -> BytesIO:
     )  
     plt.axis('off')
     plt.tight_layout(pad=0.1) 
+    plt.margins(0.1)
     plt.savefig(buffer, format='png', dpi=150)
     plt.close()
 
