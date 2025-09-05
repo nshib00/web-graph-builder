@@ -9,6 +9,7 @@ from app.excel_parser import get_graph_from_excel
 from app.graph import build_graph, find_longest_path, get_graph_image
 
 
+ALLOWED_EXTENSIONS = ('.xlsx', '.xls')
 app_router = APIRouter(tags=["Показ картинки"])
 
 
@@ -22,12 +23,12 @@ async def get_main_page() -> HTMLResponse:
 @app_router.post('/upload')
 async def upload(file: UploadFile = File(...)):
     if file.filename is not None:
-        if not file.filename.endswith('.xlsx'):
+        if not any(file.filename.endswith(ext) for ext in ALLOWED_EXTENSIONS):
             raise HTTPException(
                 status_code=400,
                 detail=(
-                    f'Given file with unallowed extension.'
-                    'Graph loading is allowed from .xlsx file only.'
+                    'Given file with unallowed extension.'
+                    f'Allowed file extensions: {", ".join(ALLOWED_EXTENSIONS)}'
                 )
             )
         try:
