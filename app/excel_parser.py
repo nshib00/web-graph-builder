@@ -1,6 +1,7 @@
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-import uuid
+
 import openpyxl
 
 
@@ -16,13 +17,12 @@ def to_int_or_none(value):
 def get_graph_from_excel(file_obj, filename: str) -> dict:
     workbook = openpyxl.load_workbook(file_obj, data_only=True, read_only=True)
     sheet = workbook.worksheets[0]
-    edges = []  
+    edges = []
     nodes = set()  # повторяющиеся узлы будут игнорированы
 
     first_row = next(sheet.iter_rows(min_row=1, max_row=1, values_only=True))
     has_headers = any(
-        not isinstance(cell, (int, float)) 
-        for cell in first_row
+        not isinstance(cell, (int, float)) for cell in first_row
     )  # если хотя бы один элемент первой строки не число - считаем ее заголовком
     start_row = 2 if has_headers else 1
 
@@ -34,10 +34,7 @@ def get_graph_from_excel(file_obj, filename: str) -> dict:
         if source is not None and target is not None:
             edges.append({"source": source, "target": target})
 
-    filtered_edges = [
-        e for e in edges
-        if e["source"] in nodes and e["target"] in nodes
-    ]
+    filtered_edges = [e for e in edges if e["source"] in nodes and e["target"] in nodes]
 
     return {
         "id": str(uuid.uuid4()),
