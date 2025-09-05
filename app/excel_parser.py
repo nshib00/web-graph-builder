@@ -14,17 +14,28 @@ def to_int_or_none(value):
         return None
 
 
+def is_header_row(row):
+    if not row:
+        return False 
+    for cell in row[:3]:
+        if cell is not None and isinstance(cell, str) and cell.strip():
+            return True
+    return False
+
+
 def get_graph_from_excel(file_obj, filename: str) -> dict:
     workbook = openpyxl.load_workbook(file_obj, data_only=True, read_only=True)
     sheet = workbook.worksheets[0]
     edges = []
     nodes = set()  # повторяющиеся узлы будут игнорированы
 
-    first_row = next(sheet.iter_rows(min_row=1, max_row=1, values_only=True))
-    has_headers = any(
-        not isinstance(cell, (int, float)) for cell in first_row
-    )  # если хотя бы один элемент первой строки не число - считаем ее заголовком
-    start_row = 2 if has_headers else 1
+    header_rows = 0
+    for row in sheet.iter_rows(max_row=3, values_only=True):
+        if is_header_row(row):
+            header_rows += 1
+        else:
+            break
+    start_row = header_rows + 1
 
     for row in sheet.iter_rows(min_row=start_row, values_only=True):
         source, target, node = map(to_int_or_none, row)
