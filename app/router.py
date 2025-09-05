@@ -30,7 +30,16 @@ async def upload(file: UploadFile = File(...)):
                     'Graph loading is allowed from .xlsx file only.'
                 )
             )
-        graph_dict = get_graph_from_excel(file.filename)
+        try:
+            graph_dict = get_graph_from_excel(
+                file_obj=file.file,
+                filename=file.filename
+            )
+        except (ValueError, TypeError):
+            raise HTTPException(
+                status_code=400,
+                detail=f'Invalid data in Excel file.'
+            )
         graphs_table.insert(graph_dict)
 
         image_data = get_graph_image(build_graph(graph_dict))
