@@ -6,7 +6,7 @@ from tinydb import Query
 
 from app.db import graphs_table
 from app.excel_parser import get_graph_from_excel
-from app.graph import build_graph, get_graph_image
+from app.graph import build_graph, find_longest_path, get_graph_image
 
 
 app_router = APIRouter(tags=["Показ картинки"])
@@ -42,12 +42,18 @@ async def upload(file: UploadFile = File(...)):
             )
         graphs_table.insert(graph_dict)
 
-        image_data = get_graph_image(build_graph(graph_dict))
-        return JSONResponse({"image": image_data})
+        graph = build_graph(graph_dict)
+        image_data = get_graph_image(graph)
+        return JSONResponse(
+            {
+                "image": image_data,
+                "longest_path": find_longest_path(graph)
+            }
+        )
 
 
 @app_router.get('/graphs')
-async def get_graphs_list():
+async def get_graphs_list(limit: int = 50, offset: int = 0):
     graphs = graphs_table.all()
     return sorted(graphs, key=lambda g: g['upload_time'], reverse=True)
 
@@ -62,6 +68,9 @@ async def get_graph_by_id(graph_id: str):
             raise HTTPException(status_code=404, detail='Graph not found.')
         graph = build_graph(graph_data[0])
         image_data = get_graph_image(graph)
-        return {"image": image_data}
+        return {
+            "image": image_data,
+            "longest_path": find_longest_path(graph)
+        }
     except ValueError:
         raise HTTPException(status_code=400, detail=f'Invalid UUID format: {graph_id}')
